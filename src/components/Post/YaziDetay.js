@@ -2,14 +2,14 @@ import React ,{useEffect,useState} from 'react'
 import Yorumlar from '../Comment/Yorumlar';
 import { api } from '../../api';
 import axios from 'axios';
-import {Link} from "react-router-dom";
+import {Link, useParams,useHistory} from "react-router-dom";
 import SilModal from './SilModal';
-export default function YaziDetay(props) {
-    const {id}=props.match.params;
+export default function YaziDetay() {
+    const {id}=useParams();
     const [data,setData]=useState();
     const [comments,setComments]=useState([]);
-   
     const [hata,setHata]=useState();
+    const history=useHistory();
     const handleCommentSubmit=(e,comment)=>{
         e.preventDefault();
         api().post(`/posts/${id}/comments`, comment)
@@ -39,7 +39,7 @@ export default function YaziDetay(props) {
                   
                 </div>
                 <div className="btn-group btn-group-sm w-25" role="group">
-                    <SilModal post={data} push={props.history.push}/>
+                    <SilModal post={data} push={history.push}/>
                     <Link to={`/post/${data.id}/edit`} className="btn btn-primary">Düzenle</Link>
                 </div>
                 <p>{data.content}</p>

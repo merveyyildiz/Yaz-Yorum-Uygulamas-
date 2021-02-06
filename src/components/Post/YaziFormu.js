@@ -1,9 +1,11 @@
 import {api} from "../../api";
 import React,{useState,useEffect} from "react";
-import {withRouter} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 const YaziFormu=(props)=>{
     const [post,setPost]=useState( {title: "",content: ""})
     const [hata,setHata]=useState()
+    const {id}=useParams();
+    const history=useHistory();
     useEffect(()=>{
         if(props.post?.title && props.post?.content){/*eğer post yoksa devamına bakma */
             setPost(props.post)
@@ -16,8 +18,8 @@ const YaziFormu=(props)=>{
     const onFormSubmit=(e)=>{
         e.preventDefault();
         if(props.post?.title){//edit
-            api().put(`/posts/${props.match.params.id}`,post)
-            .then(res=>{props.history.push(`/post/${props.match.params.id}`)})
+            api().put(`/posts/${id}`,post)
+            .then(res=>{history.push(`/post/${id}`)})
               
         }else{//create
             api().post(`/posts`,post)
@@ -26,7 +28,7 @@ const YaziFormu=(props)=>{
         }
     }
     const goHome=()=>{
-        props.history.push("/");
+        history.push("/");
     }
     return(
         <div className="form-group ">
@@ -46,4 +48,4 @@ const YaziFormu=(props)=>{
         </div>
     )
 }
-export default withRouter(YaziFormu);
+export default YaziFormu;
