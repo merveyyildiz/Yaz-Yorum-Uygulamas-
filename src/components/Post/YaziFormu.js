@@ -1,33 +1,42 @@
 import {api} from "../../api";
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import {withRouter} from "react-router-dom";
 const YaziFormu=(props)=>{
-    const [text,setText]=useState({title:"",content:""})
+    const [post,setPost]=useState( {title: "",content: ""})
     const [hata,setHata]=useState()
+    useEffect(()=>{
+        if(props.post?.title && props.post?.content){/*eğer post yoksa devamına bakma */
+            setPost(props.post)
+        }
+    },[props.post])
+
     const onHandleChange=e=>{
-        setText({...text,[e.target.name]:e.target.value})
+        setPost({...post,[e.target.name]:e.target.value})
     }
     const onFormSubmit=(e)=>{
         e.preventDefault();
-        api().post(`/posts`,text)
-        .then(res=>{
-            goHome();
-        })
-        .catch(err=>{setHata(err.response.data.errorMessage)})
+        if(props.post?.title){//edit
+            api().put(`/posts/${props.match.params.id}`,post)
+            .then(res=>{props.history.push(`/post/${props.match.params.id}`)})
+              
+        }else{//create
+            api().post(`/posts`,post)
+            .then(res=>{ goHome()})
+            .catch(err=>{setHata(err.response.data.errorMessage)})
+        }
     }
     const goHome=()=>{
-        props.history.push("./");
+        props.history.push("/");
     }
     return(
         <div className="form-group ">
-            <h4 className="text-center my-3">Yazı Ekleme Formu</h4>
             {hata &&<div className="alert alert-danger">{hata}</div>}
             <div className="form-floating mt-1">
-                <input className="form-control " id="title" name="title" value={text.title} onChange={e=>onHandleChange(e)} placeholder="Yazı Başlığı"/>
+                <input className="form-control " id="title" name="title" value={post.title} onChange={e=>onHandleChange(e)} placeholder="Yazı Başlığı"/>
                 <label htmlFor="title">Başlık</label>
             </div>
             <div className="form-floating mt-3">
-                <textarea className="form-control "  style={{height:"100%"}} id="content" name="content" placeholder="içerik" onChange={e=>onHandleChange(e)} value={text.content} />
+                <textarea className="form-control " value={post} style={{height:"100%"}} id="content" name="content" placeholder="içerik" onChange={e=>onHandleChange(e)} value={post.content} />
                 <label htmlFor="content">İçerik</label>
             </div>
             <div className="float-end mt-2">
